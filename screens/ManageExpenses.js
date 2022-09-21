@@ -5,7 +5,7 @@ import { GlobalStyles } from '../constants/style';
 import IconButton from '../components/UI/IconButton';
 import { ExpenseContext } from '../store/expenses-context';
 import ExpenseForm from '../components/ManageExpense/ExpenseForm';
-import { storeExpense } from '../util/http';
+import { storeExpense, updateExpense, deleteExpense } from '../util/http';
 
 function ManageExpenses ({ route, navigation }) {
     const expensesCtx = useContext(ExpenseContext);
@@ -21,7 +21,8 @@ useLayoutEffect(() => {
         title: isEditing ? 'Edit Expense' : 'Add Expense',
     }, [ navigation, isEditing]);
 })
- function deleteExpenseHandler () {
+ async function deleteExpenseHandler () {
+    await deleteExpense( editedExpenseId );
     expensesCtx.deleteExpense(editedExpenseId)
     navigation.goBack();
  };
@@ -30,14 +31,18 @@ useLayoutEffect(() => {
     navigation.goBack();
  };
 
- function confirmHandler (expenseData) {
-    if(isEditing) {
+ async function confirmHandler (expenseData) {
+    try { if(isEditing) {
         expensesCtx.updateExpense(editedExpenseId,expenseData);
+        // await updateExpense( editedExpenseId, expenseData);
     } else {
-        storeExpense(expenseData); 
-        expensesCtx.addExpense(expenseData)
+       const id = await storeExpense(expenseData); 
+        expensesCtx.addExpense({...expenseData, id: id})
     }
-    navigation.goBack();
+    navigation.goBack(); 
+  } catch (error) {
+    console.log(error);
+  }
  };
 
     return (

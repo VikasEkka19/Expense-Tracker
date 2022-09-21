@@ -1,12 +1,36 @@
 import axios from "axios";
 
-export function storeExpense (expenseData) {
-    axios.post('https://expense-tracker-d27c0-default-rtdb.firebaseio.com/expenses.json',
-    expenseData
-    ).then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+const BASE_URL = 'https://expense-tracker-d27c0-default-rtdb.firebaseio.com';
+
+export async function storeExpense (expenseData) {
+    const response = await axios.post(BASE_URL+'/expenses.json',expenseData);
+    const id = response.data.name;
+    return id;
     }
+
+export async function fetchExpense () {
+    const response = await axios.get(BASE_URL+'/expenses.json');
+
+    const expenses = [];
+    for(const key in response.data) {
+        const expenseObj = {
+            id: key,
+            amount: response.data[key].amount,
+            date: new Date(response.data[key].date),
+            description: response.data[key].description
+        };
+
+        expenses.push(expenseObj);
+    }
+
+    return expenses;
+
+    }
+
+ export function updateExpenses( id, expenseData) {
+    return axios.put(BASE_URL + `/expenses/${id}.json`, expenseData);
+}
+
+export function deleteExpense(id) {
+    return axios.delete(BASE_URL+`/expenses/${id}.json`)
+}
