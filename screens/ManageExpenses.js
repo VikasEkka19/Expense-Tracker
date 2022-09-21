@@ -5,7 +5,7 @@ import { GlobalStyles } from '../constants/style';
 import IconButton from '../components/UI/IconButton';
 import { ExpenseContext } from '../store/expenses-context';
 import ExpenseForm from '../components/ManageExpense/ExpenseForm';
-import { storeExpense, updateExpense, deleteExpense } from '../util/http';
+import { storeExpense, updateExpenses, deleteExpense } from '../util/http';
 
 function ManageExpenses ({ route, navigation }) {
     const expensesCtx = useContext(ExpenseContext);
@@ -31,10 +31,11 @@ useLayoutEffect(() => {
     navigation.goBack();
  };
 
+     
  async function confirmHandler (expenseData) {
     try { if(isEditing) {
         expensesCtx.updateExpense(editedExpenseId,expenseData);
-        // await updateExpense( editedExpenseId, expenseData);
+       let x= await updateExpenses( editedExpenseId, expenseData);
     } else {
        const id = await storeExpense(expenseData); 
         expensesCtx.addExpense({...expenseData, id: id})
